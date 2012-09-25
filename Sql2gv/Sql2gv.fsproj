@@ -24,7 +24,7 @@
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <DocumentationFile>bin\Debug\Sql2gv.XML</DocumentationFile>
-    <StartArguments>-s localhost\sqlexpress -d rrm -i foo -x bar baz</StartArguments>
+    <StartArguments>-s localhost\sqlexpress -d rrm -x "(sysdiagrams|Id$)" -o c:\temp\rrm.gv</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>pdbonly</DebugType>
@@ -46,9 +46,9 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Arguments.fs" />
     <Compile Include="GenerationOptions.fs" />
-    <Compile Include="MyConsole.fs" />
     <Compile Include="SchemaModel.fs" />
     <Compile Include="GraphvizRenderer.fs" />
+    <Compile Include="MyConsole.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

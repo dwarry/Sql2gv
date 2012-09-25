@@ -12,8 +12,8 @@ module GraphvizRenderer =
 
     let private columnToDot table (col: Column) = 
         let pk = match Seq.tryFindIndex (fun c -> c.Equals(col.Name)) table.PrimaryKeyColumnNames with
-                    | None -> ""
-                    | Some x -> x.ToString()
+                    | None -> " "
+                    | Some x -> (x + 1).ToString()
         let fmt = "<tr><td align=\"left\" >{3}{0}{4}</td><td>{3}{1}{4}</td><td>{3}{2}{4}</td></tr>"
         let nullableStart = if col.IsNullable then "<font color=\"gray\">" else ""
         let nullableEnd = if col.IsNullable then "</font>" else ""

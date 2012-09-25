@@ -2,9 +2,11 @@
 
 type GenerationOptions = {
 
-    IncludePattern: string;
+    Database: string;
 
-    ExcludePattern: string;
+    IncludePattern: string option;
+
+    ExcludePattern: string option;
 
     EmitSimpleNodes: bool;
 }

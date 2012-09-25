@@ -96,17 +96,39 @@ module Model =
                                                 ForeignKeyColumnNames = seq {for (_, _, col) in all do yield col}
                                            })
 
+   
 
-    let retrieveTables (connection: SqlConnection) (databaseName: string) = 
+    let retrieveTables (connection: SqlConnection) (databaseName: string) (options: GenerationOptions) = 
+        let ignoreSchemas = ["INFORMATION_SCHEMA"; "sys"]
         retrieveMany connection 
                  "sp_tables" 
                  [("@table_qualifier", databaseName)] 
                  (fun r ->
-                        let tableId = {Schema = r.GetString(1); Name =  r.GetString(2) }
-                        {
-                                Id= tableId 
-                                Columns = (retrieveColumns connection databaseName tableId);
-                                PrimaryKeyColumnNames = (retrievePrimaryKey connection databaseName tableId)
-                        })
+                        let schema = r.GetString(1)
+
+                        if Seq.exists (fun s -> s.Equals(schema)) ignoreSchemas then 
+                            None
+                        else
+
+                            let id = {Schema = schema; Name =  r.GetString(2) }
+                            let processTable = Some({
+                                                    Id = id
+                                                    Columns = (retrieveColumns connection databaseName id);
+                                                    PrimaryKeyColumnNames = (retrievePrimaryKey connection databaseName id)
+                                               })
+                                
+                            let isMatch p = 
+                                let tname =String.Concat(id.Schema, ".", id.Name) 
+                                System.Text.RegularExpressions.Regex.IsMatch(tname, p)
+
+                            match (options.IncludePattern, options.ExcludePattern) with
+                            | (Some inc, None) -> if isMatch inc then processTable else None
+                            | (Some inc, Some excl) -> if isMatch inc && not (isMatch excl) then processTable else None
+                            | (None, Some excl) -> if not (isMatch excl) then processTable else None
+                            | (None, None) -> processTable)
+             |> Seq.filter Option.isSome
+             |> Seq.map Option.get
+
+                            
     
     
