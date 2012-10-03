@@ -32,7 +32,7 @@ type Cardinality =
 type ForeignKey = { Name : string; PrimaryKeyTableId: TableId; ForeignKeyTableId: TableId; ForeignKeyColumnNames: seq<String>}
 
 module Model =
-    let private retrieveMany (connection: SqlConnection) (sproc: string) (parameters: seq<string * #obj>) (map: SqlDataReader -> 'T) = 
+    let private retrieveMany (connection: SqlConnection) (sproc: string) (parameters: seq<string * #obj>) (map: SqlDataReader -> 'T option) = 
         
         seq {
             use cmd = connection.CreateCommand()
@@ -40,7 +40,9 @@ module Model =
             cmd.CommandText <- sproc
             for p in parameters do cmd.Parameters.AddWithValue(fst p, snd p) |> ignore
             use reader = cmd.ExecuteReader()
-            while reader.Read() do yield map reader
+            while reader.Read() do 
+                let result = map reader
+                if Option.isSome result then yield result.Value
         } 
 
     let private retrieveOne (connection: SqlConnection) (sproc: string) (parameters: seq<string * #obj>) (map: SqlDataReader -> 'T) = 
@@ -59,7 +61,7 @@ module Model =
                      [ ("@table_qualifier", databaseName);
                        ("@table_owner", tableId.Schema);
                        ("@table_name", tableId.Name)]
-                     (fun r -> r.GetString(3))
+                     (fun r -> Some (r.GetString(3)))
         
 
     let private retrieveColumns connection databaseName tableId =
@@ -74,12 +76,24 @@ module Model =
                                      | "char" | "nchar" | "varchar" | "nvarchar" -> String.Concat(dt, "(", size, ")")
                                      | "decimal" -> String.Concat(dt, "(", size, ",", prec, ")")
                                      | _ -> dt 
-                     {
-                        Name = r.GetString(3); 
-                        DataType = dataType (r.GetString(5)) (r.GetInt32(6)) (if r.IsDBNull(8) then 0s else r.GetInt16(8)); 
-                        IsNullable = r.GetInt16(10) = 1s
-                     })
+                     Some {
+                             Name = r.GetString(3); 
+                             DataType = dataType (r.GetString(5)) (r.GetInt32(6)) (if r.IsDBNull(8) then 0s else r.GetInt16(8)); 
+                             IsNullable = r.GetInt16(10) = 1s
+                          })
 
+    let retrieveDatabases (sqlInstance:String) = 
+        let connectionString = "Server=" + sqlInstance + ";Integrated Security=SSPI"
+        use connection = new SqlConnection(connectionString)
+        connection.Open() 
+        retrieveMany connection
+                     "sp_databases"
+                     []
+                     (fun r -> 
+                        let db = r.GetString(0)
+                        match db with
+                        | "master" | "msdb" | "model" | "tempdb" -> None
+                        | _ -> Some db) |> Seq.toArray
 
     let retrieveForeignKeys connection databaseName tableId = 
         retrieveMany connection
@@ -87,7 +101,7 @@ module Model =
                      [("@pktable_qualifier", databaseName);
                       ("@pktable_owner", tableId.Schema);
                       ("@pktable_name", tableId.Name)]
-                     (fun r -> (r.GetString(11), { Schema = r.GetString(5); Name = r.GetString(6)},r.GetString(7)))
+                     (fun r -> Some (r.GetString(11), { Schema = r.GetString(5); Name = r.GetString(6)},r.GetString(7)))
             |> Seq.groupBy (fun (name, fktableId, _) -> (name, fktableId) ) 
             |> Seq.map (fun (fkId, all) -> {
                                                 Name = fst fkId; 
@@ -113,8 +127,8 @@ module Model =
                             let id = {Schema = schema; Name =  r.GetString(2) }
                             let processTable = Some({
                                                     Id = id
-                                                    Columns = (retrieveColumns connection databaseName id);
-                                                    PrimaryKeyColumnNames = (retrievePrimaryKey connection databaseName id)
+                                                    Columns = (retrieveColumns connection databaseName id) |> Seq.toArray;
+                                                    PrimaryKeyColumnNames = (retrievePrimaryKey connection databaseName id) |> Seq.toArray
                                                })
                                 
                             let isMatch p = 
@@ -126,8 +140,6 @@ module Model =
                             | (Some inc, Some excl) -> if isMatch inc && not (isMatch excl) then processTable else None
                             | (None, Some excl) -> if not (isMatch excl) then processTable else None
                             | (None, None) -> processTable)
-             |> Seq.filter Option.isSome
-             |> Seq.map Option.get
 
                             
     

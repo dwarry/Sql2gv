@@ -45,9 +45,6 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Arguments.fs" />
-    <Compile Include="GenerationOptions.fs" />
-    <Compile Include="SchemaModel.fs" />
-    <Compile Include="GraphvizRenderer.fs" />
     <Compile Include="MyConsole.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config">
@@ -62,6 +59,13 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sql2gv.Common\Sql2gv.Common.fsproj">
+      <Name>Sql2gv.Common</Name>
+      <Project>{1510d6a9-16cf-47cc-9295-6df463aa495f}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 	     Other similar extension points exist, see Microsoft.Common.targets.

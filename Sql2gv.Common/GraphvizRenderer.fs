@@ -63,6 +63,7 @@ module GraphvizRenderer =
 
     let generateDotFile (isSimpleMode: bool) (tables: seq<Table>) (foreignKeys : seq<ForeignKey>) = 
         let tableDict = tables.ToDictionary(fun t -> t.Id) 
+        let relevantFks = Seq.filter (fun fk -> tableDict.ContainsKey(fk.ForeignKeyTableId)) foreignKeys
         let nodes = String.Join("\n", seq { for t in tables do yield t |> tableToDot isSimpleMode })
-        let edges = String.Join("\n", seq { for fk in foreignKeys do yield fk |> fkToDot tableDict })
+        let edges = String.Join("\n", seq { for fk in relevantFks do yield fk |> fkToDot tableDict })
         String.Format("digraph Database {0}\n{1}\n{2}\n{3}", "{", nodes, edges, "}")

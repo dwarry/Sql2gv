@@ -1,0 +1,43 @@
+﻿<Window x:Class="Sql2gv.Ui.ShellView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xtk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:cal="http://www.caliburnproject.org"
+        Title="ShellView" Height="700" Width="900">
+    <xtk:BusyIndicator IsBusy="{Binding IsBusy}" BusyContent="{Binding BusyMessage}" DisplayAfter="5">
+        
+        <DockPanel LastChildFill="True"  >
+            <ToolBarPanel DockPanel.Dock="Top">
+                <ToolBar>
+                    <Button x:Name="Generate" Content="Go!" />
+                    <ToggleButton x:Name="UseSimpleNodes" Content="Simple" />
+                </ToolBar>
+            </ToolBarPanel>
+            <Grid DockPanel.Dock="Left">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0">SQL Server Instance:</Label>
+                <TextBox x:Name="SqlInstance" Grid.Row="1" TextWrapping="Wrap" Text="" Width="240px"/>
+                <Label Content="Database:" Grid.Row="2"/>
+                <ComboBox x:Name="Databases" Grid.Row="3" Width="240px" />
+                <ListBox x:Name="Tables" Grid.Row="4"  Width="240px" SelectionMode="Multiple" cal:Message.Attach="[TableSelectionChanged]" />
+<!--                <Button x:Name="Generate" Grid.Row="5" Width="240px" Content="_Generate"/>-->
+            </Grid>
+<!--            <TabPanel DockPanel.Dock="Right" />-->
+            <xtk:Zoombox AutoWrapContentWithViewbox="True" DockPanel.Dock="Right">
+                <Image x:Name="Diagram" />
+            </xtk:Zoombox> 
+        </DockPanel>
+
+    </xtk:BusyIndicator>
+
+</Window>
