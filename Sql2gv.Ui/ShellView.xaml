@@ -4,7 +4,7 @@
         xmlns:xtk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:cal="http://www.caliburnproject.org"
         Title="ShellView" Height="700" Width="900">
-    <xtk:BusyIndicator IsBusy="{Binding IsBusy}" BusyContent="{Binding BusyMessage}" DisplayAfter="5">
+    <xtk:BusyIndicator IsBusy="{Binding IsBusy}" DisplayAfter="5">
         
         <DockPanel LastChildFill="True"  >
             <ToolBarPanel DockPanel.Dock="Top">
@@ -33,7 +33,7 @@
 <!--                <Button x:Name="Generate" Grid.Row="5" Width="240px" Content="_Generate"/>-->
             </Grid>
 <!--            <TabPanel DockPanel.Dock="Right" />-->
-            <xtk:Zoombox AutoWrapContentWithViewbox="True" DockPanel.Dock="Right">
+            <xtk:Zoombox AutoWrapContentWithViewbox="True" DockPanel.Dock="Right" KeepContentInBounds="True">
                 <Image x:Name="Diagram" />
             </xtk:Zoombox> 
         </DockPanel>

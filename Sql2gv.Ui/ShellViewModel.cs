@@ -270,6 +270,7 @@ namespace Sql2gv.Ui
                     var psi = new ProcessStartInfo(PathToGraphviz,
                                                    args)
                         {
+                            UseShellExecute = false,
                             CreateNoWindow = true
                         };
 

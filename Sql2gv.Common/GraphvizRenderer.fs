@@ -15,7 +15,7 @@ module GraphvizRenderer =
                     | None -> " "
                     | Some x -> (x + 1).ToString()
         let fmt = "<tr><td align=\"left\" >{3}{0}{4}</td><td>{3}{1}{4}</td><td>{3}{2}{4}</td></tr>"
-        let nullableStart = if col.IsNullable then "<font color=\"gray\">" else ""
+        let nullableStart = if col.IsNullable then "<font color=\"darkgray\">" else ""
         let nullableEnd = if col.IsNullable then "</font>" else ""
         String.Format(fmt, col.Name, col.DataType, pk, nullableStart, nullableEnd)
 
@@ -53,7 +53,7 @@ module GraphvizRenderer =
         | Cardinality.ZeroOrOneToOne -> "arrowtail=teeodot,arrowhead=tee"
         | Cardinality.ZeroOrOneToZeroOrMany -> "arrowtail=teeodot,arrowhead=crowodot"
         | Cardinality.ZeroOrOneToZeroOrOne -> "arrowtail=teeodot,arrowhead=teeodot"   
-
+        
     let private fkToDot (tables: Dictionary<TableId, Table>) (fk: ForeignKey) = 
         String.Format("{0} -> {1} [{2},dir=both]", 
                       tableIdToNodeName fk.PrimaryKeyTableId,
@@ -66,4 +66,5 @@ module GraphvizRenderer =
         let relevantFks = Seq.filter (fun fk -> tableDict.ContainsKey(fk.ForeignKeyTableId)) foreignKeys
         let nodes = String.Join("\n", seq { for t in tables do yield t |> tableToDot isSimpleMode })
         let edges = String.Join("\n", seq { for fk in relevantFks do yield fk |> fkToDot tableDict })
-        String.Format("digraph Database {0}\n{1}\n{2}\n{3}", "{", nodes, edges, "}")
+        let graphOptions = "fontname=Arial\nfontsize=10\nnode [shape=box3d]\n"
+        String.Format("digraph Database {0}\n{1}\n{2}\n{3}\n{4}", "{", graphOptions, nodes, edges, "}")
