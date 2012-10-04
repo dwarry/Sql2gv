@@ -20,9 +20,11 @@ namespace Sql2gv.Ui
             OverrideBindingConventions();
         }
 
-        protected override object GetInstance(Type service, string key)
+        protected override void OnExit(object sender, EventArgs e)
         {
-            return base.GetInstance(service, key);
+            base.OnExit(sender, e);
+
+
         }
 
         private void OverrideBindingConventions()

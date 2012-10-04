@@ -16,20 +16,9 @@ using Microsoft.FSharp.Core;
 
 namespace Sql2gv.Ui
 {
-    public interface IShellViewModel
-    {
-        Boolean IsBusy { get; }
+   
 
-        String BusyMessage { get; }
-
-        String SqlInstance { get; set; }
-        
-        IObservableCollection<String> Databases { get; }
-        
-        String SelectedDatabase { get; set; }
-    }
-
-    public class ShellViewModel : Screen, IShellViewModel
+    public class ShellViewModel : Screen
     {
         private String _sqlInstance = "";
         private readonly BindableCollection<String> _databases = new BindableCollection<String>();
@@ -37,14 +26,24 @@ namespace Sql2gv.Ui
         private readonly BindableCollection<ListBoxItem> _tables = new BindableCollection<ListBoxItem>();
 
 
-        protected void NotifyPropertyChanged([CallerMemberName] String propertyName = null)
+        /// <summary>
+        /// Shadow the inherited version to use <see cref="CallerMemberNameAttribute"/>
+        /// to provide the name of the property that has changed, rather than
+        /// unpacking expressions or using magic strings.
+        /// </summary>
+        /// <param name="propertyName"></param>
+        protected new void NotifyOfPropertyChange([CallerMemberName] String propertyName = null)
         {
-            NotifyOfPropertyChange(propertyName);    
+            ((PropertyChangedBase) this).NotifyOfPropertyChange(propertyName);    
         }
 
 
         private Boolean _isBusy;
 
+        /// <summary>
+        /// Flag that indicates that the ViewModel is busy with some operation
+        /// and the UI should be disabled until it has been completed.
+        /// </summary>
         public virtual Boolean IsBusy
         {
             get { return _isBusy; }
@@ -54,7 +53,7 @@ namespace Sql2gv.Ui
                 if (_isBusy != value)
                 {
                     _isBusy = value;
-                    NotifyPropertyChanged();
+                    NotifyOfPropertyChange();
                 }
             }
         }
@@ -70,7 +69,7 @@ namespace Sql2gv.Ui
                 if (_busyMessage != value)
                 {
                     _busyMessage = value;
-                    NotifyPropertyChanged();
+                    NotifyOfPropertyChange();
                 }
             }
         }
@@ -85,7 +84,7 @@ namespace Sql2gv.Ui
                 if (_sqlInstance != value)
                 {
                     _sqlInstance = value;
-                    NotifyPropertyChanged();
+                    NotifyOfPropertyChange();
                     RetrieveDatabases();
                 }
             }
@@ -145,7 +144,7 @@ namespace Sql2gv.Ui
                 if (_selectedDatabase != value)
                 {
                     _selectedDatabase = value;
-                    NotifyPropertyChanged();
+                    NotifyOfPropertyChange();
                     RetrieveTablesAsync();
                 }
             }
@@ -190,6 +189,7 @@ namespace Sql2gv.Ui
         public void TableSelectionChanged()
         {
             Generate();
+            CanSave = CanCopyToClipboard = Tables.Any(x => x.IsSelected);
         }
 
 
@@ -204,7 +204,49 @@ namespace Sql2gv.Ui
                 if (_useSimpleNodes != value)
                 {
                     _useSimpleNodes = value;
-                    NotifyPropertyChanged();
+                    NotifyOfPropertyChange();
+                    Generate();
+                }
+            }
+        }
+
+        public void Save(){
+        }
+
+
+        private Boolean _canSave;
+
+        public virtual Boolean CanSave
+        {
+            get { return _canSave; }
+            set
+            {
+
+                if (_canSave != value)
+                {
+                    _canSave = value;
+                    NotifyOfPropertyChange();
+                }
+            }
+        }
+
+        public void CopyToClipboard()
+        {
+        }
+
+
+        private Boolean _canCopyToClipboard;
+
+        public virtual Boolean CanCopyToClipboard
+        {
+            get { return _canCopyToClipboard; }
+            set
+            {
+
+                if (_canCopyToClipboard != value)
+                {
+                    _canCopyToClipboard = value;
+                    NotifyOfPropertyChange();
                 }
             }
         }
@@ -275,7 +317,7 @@ namespace Sql2gv.Ui
                         };
 
                     var proc = Process.Start(psi);
-
+                    
                     proc.WaitForExit();
                 });
 
@@ -303,7 +345,7 @@ namespace Sql2gv.Ui
                 //if (_diagram != value)
                 //{
                     _diagram = value;
-                    NotifyPropertyChanged();
+                    NotifyOfPropertyChange();
                 //}
             }
         }

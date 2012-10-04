@@ -3,38 +3,76 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:xtk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:cal="http://www.caliburnproject.org"
-        Title="ShellView" Height="700" Width="900">
-    <xtk:BusyIndicator IsBusy="{Binding IsBusy}" DisplayAfter="5">
-        
+        Title="SQL Diagrams" Height="700" Width="900">
+    <Window.Resources>
+        <Style TargetType="{x:Type Viewbox}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type UIElement}, AncestorLevel=1}, Path=IsEnabled}" Value="False">
+                    <Setter Property="Opacity" Value="0.3"></Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
+    <xtk:BusyIndicator IsBusy="{Binding IsBusy}" DisplayAfter="2">
+ 
+        <xtk:BusyIndicator.BusyContent>
+            <StackPanel Orientation="Horizontal">
+                <StaticResource ResourceKey="WaitDrawing" />
+
+                <Label Content="{Binding BusyMessage}" />
+            </StackPanel>
+        </xtk:BusyIndicator.BusyContent>
+
         <DockPanel LastChildFill="True"  >
-            <ToolBarPanel DockPanel.Dock="Top">
+            <ToolBarPanel DockPanel.Dock="Top" HorizontalAlignment="Right">
                 <ToolBar>
-                    <Button x:Name="Generate" Content="Go!" />
-                    <ToggleButton x:Name="UseSimpleNodes" Content="Simple" />
+                    <ToggleButton x:Name="UseSimpleNodes" Content="{StaticResource Network}" />
+                    <Button x:Name="Save" Content="{StaticResource Document}" />
+                    <Button x:Name="CopyToClipboard" Content="{StaticResource Clipboard}" />
                 </ToolBar>
             </ToolBarPanel>
-            <Grid DockPanel.Dock="Left">
+            <Grid DockPanel.Dock="Left" Margin="4" >
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
+                
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Label Grid.Row="0">SQL Server Instance:</Label>
-                <TextBox x:Name="SqlInstance" Grid.Row="1" TextWrapping="Wrap" Text="" Width="240px"/>
-                <Label Content="Database:" Grid.Row="2"/>
-                <ComboBox x:Name="Databases" Grid.Row="3" Width="240px" />
-                <ListBox x:Name="Tables" Grid.Row="4"  Width="240px" SelectionMode="Multiple" cal:Message.Attach="[TableSelectionChanged]" />
-<!--                <Button x:Name="Generate" Grid.Row="5" Width="240px" Content="_Generate"/>-->
+                
+                <GroupBox Grid.Row="0">
+                    <GroupBox.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <StaticResource ResourceKey="Database" />
+                            <Label FontSize="44px" FontFamily="Calibri" Content="Database" />
+                        </StackPanel>
+                    </GroupBox.Header>
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                        <Label>SQL Server Instance:</Label>
+                        <TextBox x:Name="SqlInstance" TextWrapping="Wrap" Text="" />
+                        <Label Content="Database:" />
+                        <ComboBox x:Name="Databases" />
+
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Grid.Row="1">
+                    <GroupBox.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <StaticResource ResourceKey="Table" />
+                            <Label FontSize="44px" FontFamily="Calibri" Content="Tables" />
+                        </StackPanel>
+                    </GroupBox.Header>
+
+                    <ListBox x:Name="Tables" SelectionMode="Multiple" cal:Message.Attach="[TableSelectionChanged]" />
+                </GroupBox>
             </Grid>
-<!--            <TabPanel DockPanel.Dock="Right" />-->
             <xtk:Zoombox AutoWrapContentWithViewbox="True" DockPanel.Dock="Right" KeepContentInBounds="True">
-                <Image x:Name="Diagram" />
+                <Image x:Name="Diagram" >
+                    
+                </Image>
             </xtk:Zoombox> 
         </DockPanel>
 
