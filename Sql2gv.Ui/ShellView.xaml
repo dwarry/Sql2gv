@@ -52,7 +52,7 @@
                     </GroupBox.Header>
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
                         <Label>SQL Server Instance:</Label>
-                        <TextBox x:Name="SqlInstance" TextWrapping="Wrap" Text="" />
+                        <xtk:WatermarkTextBox x:Name="SqlInstance" Watermark="ServerName\Instance" />
                         <Label Content="Database:" />
                         <ComboBox x:Name="Databases" />
 
@@ -69,7 +69,7 @@
                     <ListBox x:Name="Tables" SelectionMode="Multiple" cal:Message.Attach="[TableSelectionChanged]" />
                 </GroupBox>
             </Grid>
-            <xtk:Zoombox AutoWrapContentWithViewbox="True" DockPanel.Dock="Right" KeepContentInBounds="True">
+            <xtk:Zoombox AutoWrapContentWithViewbox="True" DockPanel.Dock="Right"  KeepContentInBounds="True">
                 <Image x:Name="Diagram" >
                     
                 </Image>
