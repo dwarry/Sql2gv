@@ -8,9 +8,14 @@ open System.Linq
 
 type Column = { Name: string; DataType: string; IsNullable: Boolean}
 
-type TableId = {Schema : string; Name : String}
+type TableId = 
+    {Schema : string; Name : String}
+    override this.ToString() = this.Schema + "." + this.Name
+    
+type Table = 
+    { Id: TableId; Columns: seq<Column>; PrimaryKeyColumnNames: seq<String> }
+    override this.ToString() = this.Id.ToString()
 
-type Table = { Id: TableId; Columns: seq<Column>; PrimaryKeyColumnNames: seq<String> }
 
 type Index = 
     | PrimaryKey of seq<Column>
