@@ -21,14 +21,18 @@ namespace Sql2gv.Ui
 {
     public class ShellViewModel : Screen, IDisposable
     {
+        private readonly IWindowManager _windowManager;
         private static readonly String OutputFile = Environment.ExpandEnvironmentVariables("%TMP%\\database{0}.png");
 
         private static readonly String PathToGraphviz = ConfigurationManager.AppSettings["PathToGraphviz"];
         private static readonly string GvFile = Environment.ExpandEnvironmentVariables("%TMP%\\database.gv");
         private readonly BindableCollection<String> _databases = new BindableCollection<String>();
+        private readonly IMessageBoxManager _messageBoxManager;
+        public readonly List<Table> _selectedTables = new List<Table>();
         private readonly BindableCollection<Table> _tables = new BindableCollection<Table>();
         private String _busyMessage;
         private Boolean _canCopyToClipboard;
+        private Boolean _canEdit;
         private Boolean _canSave;
         private string _diagram;
         private Int32 _imageFileNumber;
@@ -39,6 +43,23 @@ namespace Sql2gv.Ui
         private String _sqlInstance = "";
         private IDisposable _tableSelectionObserver;
         private Boolean _useSimpleNodes;
+
+
+        public ShellViewModel(IMessageBoxManager messageBoxManager, IWindowManager windowManager)
+        {
+            _windowManager = windowManager ?? new WindowManager();
+            _messageBoxManager = messageBoxManager ?? new MessageBoxManager();
+
+            _tableSelectionObserver = Observable.FromEventPattern<PropertyChangedEventArgs>(this,
+                                                                                            "PropertyChanged")
+                    .Where(x => x.EventArgs.PropertyName == "TableSelection")
+                    .Throttle(TimeSpan.FromMilliseconds(750))
+                    .Subscribe(x => Generate());
+        }
+
+
+        public ShellViewModel()
+                : this(new MessageBoxManager(), new WindowManager()) {}
 
         #region Implementation of IDisposable
 
@@ -67,24 +88,14 @@ namespace Sql2gv.Ui
 
             if (disposing)
             {
-//                _tableSelectionObserver.Dispose();
-//                _tableSelectionObserver = null;
+                _tableSelectionObserver.Dispose();
+                _tableSelectionObserver = null;
             }
 
             _disposed = true;
         }
 
         #endregion
-
-        public ShellViewModel()
-        {
-            _tableSelectionObserver = Observable.FromEventPattern<PropertyChangedEventArgs>(this,
-                                                                                            "PropertyChanged")
-                    .Where(x => x.EventArgs.PropertyName == "TableSelection")
-                    .Throttle(TimeSpan.FromMilliseconds(750))
-                    .Subscribe(x => Generate());
-        }
-
 
         /// <summary>
         /// Flag that indicates that the ViewModel is busy with some operation
@@ -212,6 +223,19 @@ namespace Sql2gv.Ui
             }
         }
 
+        public virtual Boolean CanEdit
+        {
+            get { return _canEdit; }
+            set
+            {
+                if (_canEdit != value)
+                {
+                    _canEdit = value;
+                    NotifyOfPropertyChange();
+                }
+            }
+        }
+
         public virtual string Diagram
         {
             get { return _diagram; }
@@ -265,7 +289,19 @@ namespace Sql2gv.Ui
 
         private async Task<IEnumerable<String>> RetrieveDatabasesAsync()
         {
-            return await Task.Run(() => Model.retrieveDatabases(SqlInstance));
+            return await Task.Run(() =>
+                {
+                    try
+                    {
+                        return Model.retrieveDatabases(SqlInstance);
+                    }
+                    catch (Exception e)
+                    {
+                        _messageBoxManager.ShowMessage("Could not connect to database at " + SqlInstance);
+
+                        return new string[0];
+                    }
+                });
         }
 
 
@@ -303,24 +339,29 @@ namespace Sql2gv.Ui
             }
         }
 
-        public readonly List<Table> _selectedTables = new List<Table>();
 
         public void TableSelectionChanged(SelectionChangedEventArgs args)
         {
             _selectedTables.AddRange(args.AddedItems.Cast<Table>());
 
-            foreach(Table tbl in args.RemovedItems)
+            foreach (Table tbl in args.RemovedItems)
             {
                 _selectedTables.Remove(tbl);
             }
 
-            CanSave = CanCopyToClipboard = _selectedTables.Any();
+            CanEdit = CanSave = CanCopyToClipboard = _selectedTables.Any();
             NotifyOfPropertyChange("TableSelection");
         }
 
 
         public void Save() {}
 
+        public void ShowCredits()
+        {
+            var credits = IoC.Get<CreditsViewModel>();
+
+            _windowManager.ShowDialog(credits);
+        }
 
         public void CopyToClipboard()
         {
@@ -348,18 +389,17 @@ namespace Sql2gv.Ui
 
         private async void GenerateAsync()
         {
-
             using (var conn = new SqlConnection(ConnectionString))
             {
                 await conn.OpenAsync();
 
 
-                var fks = await Task.Run(() =>
-                                         _selectedTables.SelectMany(x => Model.retrieveForeignKeys(conn,
-                                                                                                  SelectedDatabase,
-                                                                                                  x.Id))
-                                                 .ToArray()
-                                        );
+                ForeignKey[] fks = await Task.Run(() =>
+                                                  _selectedTables.SelectMany(x => Model.retrieveForeignKeys(conn,
+                                                                                                            SelectedDatabase,
+                                                                                                            x.Id))
+                                                          .ToArray()
+                                                 );
 
                 String gv = await Task.Run(() => GraphvizRenderer.generateDotFile(UseSimpleNodes,
                                                                                   _selectedTables,
@@ -375,24 +415,8 @@ namespace Sql2gv.Ui
             string newFile = String.Format(OutputFile,
                                            ++_imageFileNumber);
 
-            await Task.Run(() =>
-                {
-                    string args = String.Format("-Tpng -o\"{0}\" \"{1}\"",
-                                                newFile,
-                                                GvFile);
-
-
-                    var psi = new ProcessStartInfo(PathToGraphviz,
-                                                   args)
-                        {
-                                UseShellExecute = false,
-                                CreateNoWindow = true
-                        };
-
-                    Process proc = Process.Start(psi);
-
-                    proc.WaitForExit();
-                });
+            await GenerateImage("png",
+                                newFile);
 
             if (File.Exists(newFile))
             {
@@ -402,6 +426,45 @@ namespace Sql2gv.Ui
             {
                 Diagram = null;
             }
+        }
+
+
+        private static async Task GenerateImage(String fileType, String outputFile)
+        {
+            string args = String.Format("-T{0} -o\"{1}\" \"{2}\"",
+                                        fileType,
+                                        outputFile,
+                                        GvFile);
+
+
+            var psi = new ProcessStartInfo(Path.Combine(PathToGraphviz,
+                                                        "dot.exe"),
+                                           args)
+                {
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                };
+
+            await Task.Run(() =>
+                {
+                    Process proc = Process.Start(psi);
+
+                    proc.WaitForExit();
+                });
+        }
+
+
+        public void Edit()
+        {
+            string pathToGvedit = Path.Combine(PathToGraphviz,
+                                               "gvedit.exe");
+
+            string args = String.Concat("\"",
+                                        GvFile,
+                                        "\"");
+
+            Process.Start(pathToGvedit,
+                          args);
         }
     }
 }

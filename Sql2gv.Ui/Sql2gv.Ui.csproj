@@ -80,11 +80,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Credits.xaml.cs">
-      <DependentUpon>Credits.xaml</DependentUpon>
+    <Compile Include="CreditsView.xaml.cs">
+      <DependentUpon>CreditsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CreditsViewModel.cs" />
+    <Compile Include="MessageBoxManager.cs" />
     <Compile Include="ShellViewModel.cs" />
-    <Page Include="Credits.xaml">
+    <Page Include="CreditsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -138,6 +140,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Properties\graphy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="graphy.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

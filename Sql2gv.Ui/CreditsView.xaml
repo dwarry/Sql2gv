@@ -1,4 +1,4 @@
-﻿<Window x:Class="Sql2gv.Ui.Credits"
+﻿<Window x:Class="Sql2gv.Ui.CreditsView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Credits" Height="350" Width="700" >
@@ -50,12 +50,12 @@
             
             <StaticResource ResourceKey="Database"  />
             <StaticResource ResourceKey="Document"  />
-
+            <StaticResource ResourceKey="Edit" />
         </StackPanel>
             
 
         <TextBlock Grid.Column="1" Grid.Row="2" TextWrapping="Wrap">
-            "Database", "Document" designed by <Hyperlink NavigateUri="http://thenounproject.com/DmitryBaranovskiy">Dmitry Baranovskiy</Hyperlink>  
+            "Database", "Document", "Pen" designed by <Hyperlink NavigateUri="http://thenounproject.com/DmitryBaranovskiy">Dmitry Baranovskiy</Hyperlink>  
         </TextBlock>
         <!--
        <a href="http://thenounproject.com/noun/network/#icon-No1056" target="_blank">Network</a> designed by <a href="http://thenounproject.com/stijnjanmaat" target="_blank">Stijn Janmaat</a> from The Noun Project 

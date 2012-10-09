@@ -17,9 +17,9 @@ namespace Sql2gv.Ui
     /// <summary>
     /// Interaction logic for Credits.xaml
     /// </summary>
-    public partial class Credits : Window
+    public partial class CreditsView : Window
     {
-        public Credits()
+        public CreditsView()
         {
             InitializeComponent();
         }

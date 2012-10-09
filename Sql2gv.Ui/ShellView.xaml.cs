@@ -23,6 +23,7 @@ namespace Sql2gv.Ui
         public ShellView()
         {
             InitializeComponent();
+            
         }
     }
 }
