@@ -42,7 +42,7 @@
         </StackPanel>
         <TextBlock Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" TextOptions.TextFormattingMode="Display">
             Icons are taken from <Hyperlink NavigateUri="http://thenounproject.com/" >The Noun Project</Hyperlink> and
-            converted from SVG into XAML using Inkscape. "Waiting Room", "Network", "Table" and "Clipboard" are public domain
+            converted from SVG into XAML using Inkscape. "Waiting Room", "Table" and "Clipboard" are public domain
             Waiting Room, from
             <Hyperlink NavigateUri="http://thenounproject.com/noun/waiting-room/#icon-No621" >The Noun Project</Hyperlink>
         </TextBlock>
