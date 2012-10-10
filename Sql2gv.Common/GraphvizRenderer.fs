@@ -53,6 +53,7 @@ module GraphvizRenderer =
         | Cardinality.ZeroOrOneToOne -> "arrowtail=teeodot,arrowhead=tee"
         | Cardinality.ZeroOrOneToZeroOrMany -> "arrowtail=teeodot,arrowhead=crowodot"
         | Cardinality.ZeroOrOneToZeroOrOne -> "arrowtail=teeodot,arrowhead=teeodot"   
+        | _ -> "arrowtail=none,arrowhead=none"
         
     let private fkToDot (tables: Dictionary<TableId, Table>) (fk: ForeignKey) = 
         String.Format("{0} -> {1} [{2},dir=both]", 
@@ -66,5 +67,5 @@ module GraphvizRenderer =
         let relevantFks = Seq.filter (fun fk -> tableDict.ContainsKey(fk.ForeignKeyTableId)) foreignKeys
         let nodes = String.Join("\n", seq { for t in tables do yield t |> tableToDot isSimpleMode })
         let edges = String.Join("\n", seq { for fk in relevantFks do yield fk |> fkToDot tableDict })
-        let graphOptions = "fontname=Arial\nfontsize=10\nnode [shape=box3d]\n"
+        let graphOptions = "node [shape=box3d,fontname=Arial,fontsize=10]\n"
         String.Format("digraph Database {0}\n{1}\n{2}\n{3}\n{4}", "{", graphOptions, nodes, edges, "}")

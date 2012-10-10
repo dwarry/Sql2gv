@@ -321,7 +321,6 @@ namespace Sql2gv.Ui
                         await conn.OpenAsync();
                         IEnumerable<Table> tbls = await Task.Run(
                                 () => Model.retrieveTables(conn,
-                                                           SelectedDatabase,
                                                            new GenerationOptions(SelectedDatabase,
                                                                                  FSharpOption<String>.None,
                                                                                  new FSharpOption<string>("Id$"),
@@ -396,7 +395,6 @@ namespace Sql2gv.Ui
 
                 ForeignKey[] fks = await Task.Run(() =>
                                                   _selectedTables.SelectMany(x => Model.retrieveForeignKeys(conn,
-                                                                                                            SelectedDatabase,
                                                                                                             x.Id))
                                                           .ToArray()
                                                  );

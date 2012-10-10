@@ -56,9 +56,9 @@ the standard output stream."; Required=false };
 
         connection.Open() |> ignore
 
-        let tables = Model.retrieveTables connection parsedArgs.[dbArg] options
+        let tables = Model.retrieveTables connection options
         
-        let foreignKeys = seq { for t in tables do yield! Model.retrieveForeignKeys connection db t.Id }
+        let foreignKeys = seq { for t in tables do yield! Model.retrieveForeignKeys connection t.Id }
         
         writeOutput tables foreignKeys options (getArg outputArg) |> ignore
 
