@@ -84,6 +84,7 @@
       <DependentUpon>CreditsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="CreditsViewModel.cs" />
+    <Compile Include="FileDialogManager.cs" />
     <Compile Include="MessageBoxManager.cs" />
     <Compile Include="ShellViewModel.cs" />
     <Page Include="CreditsView.xaml">

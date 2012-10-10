@@ -21,6 +21,7 @@ namespace Sql2gv.Ui
 {
     public class ShellViewModel : Screen, IDisposable
     {
+        private readonly IFileDialogManager _fileDialogManager;
         private readonly IWindowManager _windowManager;
         private static readonly String OutputFile = Environment.ExpandEnvironmentVariables("%TMP%\\database{0}.png");
 
@@ -45,8 +46,9 @@ namespace Sql2gv.Ui
         private Boolean _useSimpleNodes;
 
 
-        public ShellViewModel(IMessageBoxManager messageBoxManager, IWindowManager windowManager)
+        public ShellViewModel(IMessageBoxManager messageBoxManager, IWindowManager windowManager, IFileDialogManager fileDialogManager)
         {
+            _fileDialogManager = fileDialogManager ?? new FileDialogManager();
             _windowManager = windowManager ?? new WindowManager();
             _messageBoxManager = messageBoxManager ?? new MessageBoxManager();
 
@@ -59,7 +61,8 @@ namespace Sql2gv.Ui
 
 
         public ShellViewModel()
-                : this(new MessageBoxManager(), new WindowManager()) {}
+                : this(new MessageBoxManager(), new WindowManager(), new FileDialogManager()) 
+        {}
 
         #region Implementation of IDisposable
 
@@ -353,7 +356,30 @@ namespace Sql2gv.Ui
         }
 
 
-        public void Save() {}
+        public async void Save()
+        {
+            var filename = _fileDialogManager.ShowFileSaveAsDialog(SelectedDatabase);
+
+            if (filename == null)
+            {
+                return;
+            }
+
+            IsBusy = true;
+            BusyMessage = "Saving " + filename;
+
+            try
+            {
+                await GenerateImage(Path.GetExtension(filename).TrimStart('.'),
+                                filename);
+            }
+            finally
+            {
+                IsBusy = false;
+                BusyMessage = String.Empty;
+            }
+            
+        }
 
         public void ShowCredits()
         {
