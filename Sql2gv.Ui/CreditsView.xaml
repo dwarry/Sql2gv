@@ -3,12 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Credits" Height="350" Width="700" >
     <Window.Resources>
-        <Thickness x:Key="Spacing" Right="8" /> 
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Icons.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Thickness x:Key="Spacing" Right="8" /> 
+        </ResourceDictionary>
     </Window.Resources>
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -31,15 +36,17 @@
                     <Setter Property="Margin" Value="{StaticResource Spacing}" />
                 </Style>
             </StackPanel.Resources>
-            <StaticResource ResourceKey="WaitDrawing"  />
-            <StaticResource ResourceKey="Table"  />
-            <StaticResource ResourceKey="Clipboard"  />
+            <StaticResource ResourceKey="WaitDrawing" />
+            <StaticResource ResourceKey="Table" />
+            <StaticResource ResourceKey="Clipboard" />
         </StackPanel>
-        <TextBlock Grid.Column="1" Grid.Row="1" TextWrapping="Wrap">
+        <TextBlock Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" TextOptions.TextFormattingMode="Display">
             Icons are taken from <Hyperlink NavigateUri="http://thenounproject.com/" >The Noun Project</Hyperlink> and
             converted from SVG into XAML using Inkscape. "Waiting Room", "Network", "Table" and "Clipboard" are public domain
             Waiting Room, from
-            <Hyperlink NavigateUri="http://thenounproject.com/noun/waiting-room/#icon-No621" >The Noun Project</Hyperlink></TextBlock>
+            <Hyperlink NavigateUri="http://thenounproject.com/noun/waiting-room/#icon-No621" >The Noun Project</Hyperlink>
+        </TextBlock>
+
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="0">
             <StackPanel.Resources>
@@ -74,7 +81,7 @@
         </TextBlock>
         
         <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 16 ">
-            <Button x:Name="Close">Close</Button>
+            <Button x:Name="TryClose">Close</Button>
         </StackPanel>
     </Grid>
 </Window>

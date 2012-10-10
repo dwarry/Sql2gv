@@ -10,6 +10,5 @@ namespace Sql2gv.Ui
 {
     public class CreditsViewModel : Screen
     {
-
     }
 }
