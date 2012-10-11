@@ -39,12 +39,15 @@ if you need more control.
     [Stijn Janmaat](http://thenounproject.com/stijnjanmaat). The SVG icons were converted to
 	XAML by [Inkscape](http://inkscape.org).
 
- *  Caliburn.Micro
+ *  [Caliburn.Micro](http://caliburnmicro.codeplex.com)
+ 
+    Caliburn.Micro is a great Model-View-ViewModel application
+    framework which greatly simplifies data binding and commanding through an extensible
+	set of conventions. Licensed under the [MIT licence](http://caliburnmicro.codeplex.com/license).
 
-    [Caliburn.Micro](http://caliburnmicro.codeplex.com) is a great Model-View-ViewModel application
-    framework
+ *  [Extended WPF Toolkit](http://wpftoolkit.codeplex.com/)
 
- *  Extended WPF Toolkit
+    Various controls from the Extended WPF Toolkit were used, 
+	including the BusyIndicator, WatermarkTextBox and the Zoombox. 
+	Licenced under the [MS Public License](http://wpftoolkit.codeplex.com/license).  
 
-    Various controls from the [Extended WPF Toolkit](http://wpftoolkit.codeplex.com/) were used, 
-	including the BusyIndicator, WatermarkTextBox and the Zoombox.
