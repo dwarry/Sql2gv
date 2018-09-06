@@ -27,3 +27,6 @@ build
 
 *.swp
 TestResult.xml
+/.vs/Sql2gv/v15/Server/sqlite3
+/Backup
+/debug.log
